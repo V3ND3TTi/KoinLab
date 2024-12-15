@@ -1,20 +1,18 @@
-package net.koinlab
+package net.koinlab.routing
 
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.html.*
-import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.html.*
 import kotlinx.html.*
+import net.koinlab.services.getCryptoPrices
 
 fun Application.configureRouting() {
     routing {
         get("/") {
             call.respondHtml {
                 head {
-                    title { +"KoinLab Portfolio" }
+                    title { +"KoinLab" }
                     script(src = "https://unpkg.com/htmx.org@1.9.2") {}
                 }
                 body {
@@ -28,10 +26,10 @@ fun Application.configureRouting() {
                         p { +"Connect with me:" }
                         ul {
                             li {
-                                a("https://github.com/V3ND3TTi") { +"GitHub" }
+                                a("https://github.com/yourusername") { +"GitHub" }
                             }
                             li {
-                                a("https://linkedin.com/in/V3ND3TTi") { +"LinkedIn" }
+                                a("https://linkedin.com/in/yourusername") { +"LinkedIn" }
                             }
                         }
                     }
@@ -40,8 +38,15 @@ fun Application.configureRouting() {
         }
 
         get("/prices") {
-            // Dummy response for now
-            call.respondText("""{ "bitcoin": 45000, "ethereum": 3000 }""", ContentType.Application.Json)
+            val prices = getCryptoPrices()
+            call.respondHtml {
+                body {
+                    div {
+                        h2 { +"Bitcoin Price: ${prices.bitcoin?.usd} USD" }
+                        h2 { +"Ethereum Price: ${prices.ethereum?.usd} USD" }
+                    }
+                }
+            }
         }
     }
 }
